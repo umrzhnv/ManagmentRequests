@@ -1,0 +1,60 @@
+﻿@page "/parts/create"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Добавить запчасть</PageTitle>
+
+<h1>Добавить запчасть</h1>
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Part" OnValidSubmit="AddPart" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Наименование:</label> 
+                <InputText id="name" @bind-Value="Part.Name" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Part.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="serialnumber" class="form-label">Серийный номер:</label> 
+                <InputText id="serialnumber" @bind-Value="Part.SerialNumber" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Part.SerialNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Цена:</label> 
+                <InputNumber id="price" @bind-Value="Part.Price" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Part.Price" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Количество:</label> 
+                <InputNumber id="quantity" @bind-Value="Part.Quantity" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Part.Quantity" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/parts">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Part Part { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddPart()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Parts.Add(Part);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/parts");
+    }
+}

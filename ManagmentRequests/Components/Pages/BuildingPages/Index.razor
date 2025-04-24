@@ -1,0 +1,42 @@
+﻿@page "/buildings"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using ManagmentRequests.Components.Models
+@using ManagmentRequests.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+
+<PageTitle>Здания</PageTitle>
+
+<h1>Список зданий</h1>
+
+<p>
+    <a href="buildings/create">Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Buildings">
+    <PropertyColumn Property="building => building.Name" Title="Наименование" />
+    <PropertyColumn Property="building => building.Address" Title="Адрес"/>
+    <PropertyColumn Property="building => building.ContactName" Title="Контактное лицо"/>
+    <PropertyColumn Property="building => building.PhoneNumber" Title="Номер телефона"/>
+    <PropertyColumn Property="building => building.Email" Title="Почтовый адрес"/>
+    <PropertyColumn Property="building => building.CountsOfElevators" Title="Кол-во лифтов"/>
+    <PropertyColumn Property="building => building.Notes" Title="Заметки"/>
+
+    <TemplateColumn Context="building">
+        <a href="@($"buildings/edit?id={building.ID}")">Редактировать</a> |
+        <a href="@($"buildings/details?id={building.ID}")">Описание</a> |
+        <a href="@($"buildings/delete?id={building.ID}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ManagmentRequestsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,39 @@
+﻿@page "/parts"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using ManagmentRequests.Components.Models
+@using ManagmentRequests.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+
+<PageTitle>Запчасти</PageTitle>
+
+<h1>Каталог запчастей</h1>
+
+<p>
+    <a href="parts/create">Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Parts">
+    <PropertyColumn Property="part => part.Name" Title="Наименование" />
+    <PropertyColumn Property="part => part.SerialNumber" Title="Серийный номер"/>
+    <PropertyColumn Property="part => part.Price" Title="Цена" />
+    <PropertyColumn Property="part => part.Quantity" Title="Количество"/>
+
+    <TemplateColumn Context="part">
+        <a href="@($"parts/edit?id={part.ID}")">Редактировать</a> |
+        <a href="@($"parts/details?id={part.ID}")">Описание</a> |
+        <a href="@($"parts/delete?id={part.ID}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ManagmentRequestsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

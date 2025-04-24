@@ -1,0 +1,45 @@
+﻿@page "/servicerequestcs"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using ManagmentRequests.Components.Models
+@using ManagmentRequests.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+
+<PageTitle>Заявки</PageTitle>
+
+<h1>Список заявок</h1>
+
+<p>
+    <a href="servicerequestcs/create">Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.ServiceRequestcss">
+    <PropertyColumn Property="servicerequestcs => context.Elevators.First(u=>u.ID==servicerequestcs.ElevatorID).SerialNumber" Title="Серийный номер лифта"/>
+    <PropertyColumn Property="servicerequestcs =>context.Parts.First(p=>p.ID==servicerequestcs.PartID).Name" Title="Запчасть"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.Date" Title="Дата поступления"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.Description" Title="Описание"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.Type" Title="Тип"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.Status" Title="Статус"/>
+    <PropertyColumn Property="servicerequestcs => context.Technicians.First(t=>t.ID==servicerequestcs.AssignedTechnicianID).Fullname" Title="Ответственный техник"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.Priority" Title="Приоритет"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.ResolutionDate" Title="Дата решения проблемы"/>
+    <PropertyColumn Property="servicerequestcs => servicerequestcs.Notes" Title="Заметки"/>
+
+    <TemplateColumn Context="servicerequestcs">
+        <a href="@($"servicerequestcs/edit?id={servicerequestcs.ID}")">Редактировать</a> |
+        <a href="@($"servicerequestcs/details?id={servicerequestcs.ID}")">Описание</a> |
+        <a href="@($"servicerequestcs/delete?id={servicerequestcs.ID}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ManagmentRequestsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

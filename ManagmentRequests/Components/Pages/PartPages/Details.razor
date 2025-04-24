@@ -1,0 +1,52 @@
+﻿@page "/parts/details"
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Описание запчастей</PageTitle>
+
+<h1>Описание</h1>
+
+<div>
+    <h2>Запчасть</h2>
+    <hr />
+    @if (part is null)
+    {
+        <p><em>Загрузка...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Наименование</dt>
+            <dd class="col-sm-10">@part.Name</dd>
+            <dt class="col-sm-2">Серийный номер</dt>
+            <dd class="col-sm-10">@part.SerialNumber</dd>
+            <dt class="col-sm-2">Цена</dt>
+            <dd class="col-sm-10">@part.Price</dd>
+            <dt class="col-sm-2">Кол-во</dt>
+            <dd class="col-sm-10">@part.Quantity</dd>
+        </dl>
+        <div>
+            <a href="@($"/parts/edit?id={part.ID}")">Редактировать</a> |
+            <a href="@($"/parts")">Назад</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Part? part;
+
+    [SupplyParameterFromQuery]
+    private int ID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        part = await context.Parts.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (part is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,110 @@
+﻿@page "/technicians/edit"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Редактировать техника</PageTitle>
+
+<h1>Редактировать</h1>
+
+<h2>Техник</h2>
+<hr />
+@if (Technician is null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Technician" OnValidSubmit="UpdateTechnician" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Technician.ID" value="@Technician.ID" />
+                <div class="mb-3">
+                    <label for="fullname" class="form-label">ФИО:</label>
+                    <InputText id="fullname" @bind-Value="Technician.Fullname" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Technician.Fullname" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="phonenumber" class="form-label">Номер телефона:</label>
+                    <InputText id="phonenumber" @bind-Value="Technician.PhoneNumber" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Technician.PhoneNumber" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Почтовый адрес:</label>
+                    <InputText id="email" @bind-Value="Technician.Email" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Technician.Email" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="specialization" class="form-label">Специализация:</label>
+                    <InputText id="specialization" @bind-Value="Technician.Specialization" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Technician.Specialization" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="hiredate" class="form-label">Дата приема на работу:</label>
+                    <InputDate id="hiredate" @bind-Value="Technician.HireDate" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Technician.HireDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/technicians">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int ID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Technician? Technician { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Technician ??= await context.Technicians.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (Technician is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateTechnician()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Technician!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TechnicianExists(Technician!.ID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/technicians");
+    }
+
+    private bool TechnicianExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Technicians.Any(e => e.ID == id);
+    }
+}

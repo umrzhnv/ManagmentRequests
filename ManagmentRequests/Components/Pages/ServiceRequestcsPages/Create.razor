@@ -1,0 +1,121 @@
+﻿@page "/servicerequestcs/create"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Создать заявку</PageTitle>
+
+<h1>Создать заявку</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="ServiceRequestcs" OnValidSubmit="AddServiceRequestcs" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="elevatorid" class="form-label">Серийный номер лифта:</label> 
+                <InputSelect id="elevatorid" @bind-Value="ServiceRequestcs.ElevatorID" class="form-control" aria-required="true">
+                    @foreach(var elevator in elevators){
+                        <Option value="@elevator.ID">@elevator.SerialNumber</Option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => ServiceRequestcs.ElevatorID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="partid" class="form-label">Запчасть:</label> 
+                <InputSelect id="partid" @bind-Value="ServiceRequestcs.PartID" class="form-control" aria-required="true">
+                    @foreach (var part in parts){
+                        <Option value="@part.ID">@part.Name</Option>
+                    }  
+                </InputSelect>
+                <ValidationMessage For="() => ServiceRequestcs.PartID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="date" class="form-label">Дата поступления:</label> 
+                <InputDate id="date" @bind-Value="ServiceRequestcs.Date" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => ServiceRequestcs.Date" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Описание:</label> 
+                <InputText id="description" @bind-Value="ServiceRequestcs.Description" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => ServiceRequestcs.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="type" class="form-label">Тип:</label> 
+                <InputText id="type" @bind-Value="ServiceRequestcs.Type" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => ServiceRequestcs.Type" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="status" class="form-label">Статус:</label> 
+                <InputText id="status" @bind-Value="ServiceRequestcs.Status" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => ServiceRequestcs.Status" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="assignedtechnicianid" class="form-label">Ответственный техник:</label>
+                <InputSelect id="assignedtechnicianid" @bind-Value="ServiceRequestcs.AssignedTechnicianID" class="form-control" aria-required="true">
+                    @foreach (var technician in technicians){
+                        <Option value="@technician.ID">@technician.Fullname</Option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => ServiceRequestcs.AssignedTechnicianID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="priority" class="form-label">Приоритет:</label> 
+                <InputText id="priority" @bind-Value="ServiceRequestcs.Priority" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => ServiceRequestcs.Priority" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="resolutiondate" class="form-label">Дата решения проблемы:</label> 
+                <InputDate id="resolutiondate" @bind-Value="ServiceRequestcs.ResolutionDate" class="form-control" /> 
+                <ValidationMessage For="() => ServiceRequestcs.ResolutionDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="notes" class="form-label">Заметки:</label> 
+                <InputText id="notes" @bind-Value="ServiceRequestcs.Notes" class="form-control" /> 
+                <ValidationMessage For="() => ServiceRequestcs.Notes" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/servicerequestcs">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private ServiceRequestcs ServiceRequestcs { get; set; } = new();
+
+    List<Elevator> elevators = [];
+    List<Part> parts = [];
+    List<Technician> technicians = []; 
+
+    protected override void OnInitialized()
+    {
+        using var context = DbFactory.CreateDbContext();
+        elevators = context.Elevators.ToList();
+        parts = context.Parts.ToList();
+        technicians = context.Technicians.ToList();
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddServiceRequestcs()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ServiceRequestcs.Elevator = context.Elevators.First(e=>e.ID==ServiceRequestcs.ElevatorID);
+        context.ServiceRequestcss.Add(ServiceRequestcs);
+        ServiceRequestcs.Part = context.Parts.First(p => p.ID == ServiceRequestcs.PartID);
+        context.ServiceRequestcss.Add(ServiceRequestcs);
+        ServiceRequestcs.AssignedTechnician = context.Technicians.First(t => t.ID == ServiceRequestcs.AssignedTechnicianID);
+        context.ServiceRequestcss.Add(ServiceRequestcs);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/servicerequestcs");
+        
+        
+        
+    }
+}

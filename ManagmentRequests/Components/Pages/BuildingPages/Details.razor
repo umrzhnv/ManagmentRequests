@@ -1,0 +1,58 @@
+﻿@page "/buildings/details"
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Описание здания</PageTitle>
+
+<h1>Описание</h1>
+
+<div>
+    <h2>Здание</h2>
+    <hr />
+    @if (building is null)
+    {
+        <p><em>Загрузка...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Наименование</dt>
+            <dd class="col-sm-10">@building.Name</dd>
+            <dt class="col-sm-2">Адрес</dt>
+            <dd class="col-sm-10">@building.Address</dd>
+            <dt class="col-sm-2">Контактное лицо</dt>
+            <dd class="col-sm-10">@building.ContactName</dd>
+            <dt class="col-sm-2">Номер телефона</dt>
+            <dd class="col-sm-10">@building.PhoneNumber</dd>
+            <dt class="col-sm-2">Почтовый адрес</dt>
+            <dd class="col-sm-10">@building.Email</dd>
+            <dt class="col-sm-2">Кол-во лифтов</dt>
+            <dd class="col-sm-10">@building.CountsOfElevators</dd>
+            <dt class="col-sm-2">Замиетки</dt>
+            <dd class="col-sm-10">@building.Notes</dd>
+        </dl>
+        <div>
+            <a href="@($"/buildings/edit?id={building.ID}")">Редактировать</a> |
+            <a href="@($"/buildings")">Назад</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Building? building;
+
+    [SupplyParameterFromQuery]
+    private int ID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        building = await context.Buildings.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (building is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

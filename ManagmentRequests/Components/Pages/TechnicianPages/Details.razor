@@ -1,0 +1,54 @@
+﻿@page "/technicians/details"
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Описание техников</PageTitle>
+
+<h1>Описание</h1>
+
+<div>
+    <h2>Техник</h2>
+    <hr />
+    @if (technician is null)
+    {
+        <p><em>Загрузка...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ФИО</dt>
+            <dd class="col-sm-10">@technician.Fullname</dd>
+            <dt class="col-sm-2">Номер телефона</dt>
+            <dd class="col-sm-10">@technician.PhoneNumber</dd>
+            <dt class="col-sm-2">Почтовый адрес</dt>
+            <dd class="col-sm-10">@technician.Email</dd>
+            <dt class="col-sm-2">Специализация</dt>
+            <dd class="col-sm-10">@technician.Specialization</dd>
+            <dt class="col-sm-2">Дата приема на работу</dt>
+            <dd class="col-sm-10">@technician.HireDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/technicians/edit?id={technician.ID}")">Редактировать</a> |
+            <a href="@($"/technicians")">Назад</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Technician? technician;
+
+    [SupplyParameterFromQuery]
+    private int ID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        technician = await context.Technicians.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (technician is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

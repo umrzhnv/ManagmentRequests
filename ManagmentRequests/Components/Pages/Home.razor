@@ -1,0 +1,51 @@
+﻿@page "/"
+
+<PageTitle>Главная</PageTitle>
+
+<div class="container mt-1">
+    <div class="jumbotron text-center bg-light">
+        <h1 class="display-4">Добро пожаловать!</h1>
+        <p class="lead">Программное обеспечение управления заявками на техническое обслуживание лифтов</p>
+        <hr class="my-4">
+        <p>Мы помогаем вам эффективно управлять обслуживанием лифтов, повышая безопасность и надежность.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <img src="/images/elevator_requests.jpg" class="card-img-top" alt="Обслуживание лифта">
+                <div class="card-body">
+                    <h5 class="card-title">Плановое обслуживание</h5>
+                    <p class="card-text">Обеспечьте бесперебойную работу лифтов с помощью регулярного планового обслуживания.</p>
+                    <a href="/servicerequestcs" class="btn btn-primary">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+    
+
+        <div class="col-md-5">
+            <div class="card">
+                <img src="/images/elevator_repair.jpg" class="card-img-top" alt="elevator_repair">
+                <div class="card-body">
+                    <h5 class="card-title">Оперативный ремонт</h5>
+                    <p class="card-text">Быстрое реагирование на поломки и оперативное устранение неисправностей.</p>
+                    <a href="/servicerequestcs/create" class="btn btn-primary">Создать заявку</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <h2>Ключевые возможности</h2>
+        <ul>
+            <li>Удобное создание и отслеживание заявок</li>
+            <li>Автоматическое назначение заявок техникам</li>
+            <li>История обслуживания каждого лифта</li>
+            <li>Аналитика и отчетность для улучшения эффективности</li>
+        </ul>
+    </div>
+</div>
+
+@code {
+    // Можно добавить дополнительный код при необходимости
+}

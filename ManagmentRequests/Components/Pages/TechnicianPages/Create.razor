@@ -1,0 +1,65 @@
+﻿@page "/technicians/create"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Добавить техника</PageTitle>
+
+<h1>Добавить техника</h1>
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Technician" OnValidSubmit="AddTechnician" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="fullname" class="form-label">ФИО:</label> 
+                <InputText id="fullname" @bind-Value="Technician.Fullname" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Technician.Fullname" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="phonenumber" class="form-label">Номер телефона:</label> 
+                <InputText id="phonenumber" @bind-Value="Technician.PhoneNumber" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Technician.PhoneNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Почтовый алрес:</label> 
+                <InputText id="email" @bind-Value="Technician.Email" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Technician.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="specialization" class="form-label">Специализация:</label> 
+                <InputText id="specialization" @bind-Value="Technician.Specialization" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Technician.Specialization" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="hiredate" class="form-label">Дата приема на работу:</label>
+                <InputDate id="hiredate" @bind-Value="Technician.HireDate" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Technician.HireDate" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/technicians">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Technician Technician { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddTechnician()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Technicians.Add(Technician);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/technicians");
+    }
+}

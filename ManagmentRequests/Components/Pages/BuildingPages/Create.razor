@@ -1,0 +1,74 @@
+﻿@page "/buildings/create"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Добавить здание</PageTitle>
+
+<h1>Добавить здание</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Building" OnValidSubmit="AddBuilding" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Наименование:</label> 
+                <InputText id="name" @bind-Value="Building.Name" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Building.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="address" class="form-label">Адрес:</label> 
+                <InputText id="address" @bind-Value="Building.Address" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Building.Address" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="contactname" class="form-label">Контактное лицо:</label> 
+                <InputText id="contactname" @bind-Value="Building.ContactName" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Building.ContactName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="phonenumber" class="form-label">Номер телефона:</label> 
+                <InputText id="phonenumber" @bind-Value="Building.PhoneNumber" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Building.PhoneNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Почтовый адрес:</label> 
+                <InputText id="email" @bind-Value="Building.Email" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Building.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="countsofelevators" class="form-label">Кол-во лифтов:</label> 
+                <InputNumber id="countsofelevators" @bind-Value="Building.CountsOfElevators" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Building.CountsOfElevators" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="notes" class="form-label">Заметки:</label> 
+                <InputText id="notes" @bind-Value="Building.Notes" class="form-control" /> 
+                <ValidationMessage For="() => Building.Notes" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/buildings">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Building Building { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddBuilding()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Buildings.Add(Building);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/buildings");
+    }
+}

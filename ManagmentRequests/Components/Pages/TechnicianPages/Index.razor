@@ -1,0 +1,40 @@
+﻿@page "/technicians"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using ManagmentRequests.Components.Models
+@using ManagmentRequests.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+
+<PageTitle>Техники</PageTitle>
+
+<h1>Список техников</h1>
+
+<p>
+    <a href="technicians/create">Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Technicians">
+    <PropertyColumn Property="technician => technician.Fullname" Title="ФИО" />
+    <PropertyColumn Property="technician => technician.PhoneNumber" Title="Номер телефона"/>
+    <PropertyColumn Property="technician => technician.Email" Title="Почтовый адрес"/>
+    <PropertyColumn Property="technician => technician.Specialization" Title="Специализация" />
+    <PropertyColumn Property="technician => technician.HireDate" Title="Дата приема на работу"/>
+
+    <TemplateColumn Context="technician">
+        <a href="@($"technicians/edit?id={technician.ID}")">Редактировать</a> |
+        <a href="@($"technicians/details?id={technician.ID}")">Описание</a> |
+        <a href="@($"technicians/delete?id={technician.ID}")">Удалить</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ManagmentRequestsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

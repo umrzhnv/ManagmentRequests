@@ -1,0 +1,82 @@
+﻿@page "/elevators/create"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using ManagmentRequests.Components.Models
+@inject IDbContextFactory<ManagmentRequests.Data.ManagmentRequestsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Добавить лифт</PageTitle>
+
+<h1>Добавить лифт</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Elevator" OnValidSubmit="AddElevator" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="buildingid" class="form-label">Здание:</label> 
+                <InputSelect id="buildingid" @bind-Value="Elevator.BuildingID" class="form-control" aria-required="true"> 
+                    @foreach (var building in buildings){
+                        <Option value="@building.ID">@building.Name</Option>
+                    }
+                    </InputSelect>
+                <ValidationMessage For="() => Elevator.BuildingID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="serialnumber" class="form-label">Серийный номер:</label> 
+                <InputText id="serialnumber" @bind-Value="Elevator.SerialNumber" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Elevator.SerialNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="manufacture" class="form-label">Производитель:</label> 
+                <InputText id="manufacture" @bind-Value="Elevator.Manufacture" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Elevator.Manufacture" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="model" class="form-label">Модель:</label> 
+                <InputText id="model" @bind-Value="Elevator.Model" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Elevator.Model" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="capacity" class="form-label">Грузоподъемность (кг):</label> 
+                <InputNumber id="capacity" @bind-Value="Elevator.Capacity" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Elevator.Capacity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="notes" class="form-label">Заметки:</label> 
+                <InputText id="notes" @bind-Value="Elevator.Notes" class="form-control" /> 
+                <ValidationMessage For="() => Elevator.Notes" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/elevators">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Elevator Elevator { get; set; } = new();
+
+    List<Building> buildings = [];
+
+    protected override void OnInitialized()
+    {
+        using var context = DbFactory.CreateDbContext();
+        buildings = context.Buildings.ToList();
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddElevator()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Elevator.Building = context.Buildings.First(u=>u.ID==Elevator.BuildingID);
+        context.Elevators.Add(Elevator);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/elevators");
+    }
+}
